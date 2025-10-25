@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Лука Сулава — Психолог</title>
+<style>
+:root{
+    --bg:#000;
+    --panel:#1a1a1a;
+    --accent:#FF6A00;
+    --muted:#CCCCCC;
+}
+body {margin:0;font-family:Arial,Helvetica,sans-serif;background-color:var(--bg);color:#fff;}
+header{width:100%;padding:18px 28px;position:fixed;top:0;left:0;display:flex;justify-content:space-between;align-items:center;background-color:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:40;}
+.logo { font-size:18px;font-weight:700;color:var(--accent);}
+nav{display:flex; gap:18px;}
+nav a{ color: #fff; text-decoration:none; font-size:15px; transition: color .18s ease;}
+nav a:hover{ color: var(--accent);}
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:120px 20px 60px;text-align:center;background: linear-gradient(180deg,#000 0%,#111 100%);}
+h1{ margin:0; font-size:56px; letter-spacing:-1px; }
+.subtitle{ margin:12px 0 26px; font-size:20px; color:var(--accent);}
+.btn {display:inline-block;padding:12px 22px;background:var(--accent);color:#fff;border-radius:10px;border:none;font-size:16px;cursor:pointer;text-decoration:none;transition: transform .18s ease, box-shadow .18s ease;}
+.btn:active{ transform: translateY(2px);}
+.btn:hover{ transform: translateY(-4px); box-shadow:0 12px 28px rgba(255,106,0,0.10);}
+.about{padding:64px 18px;background:#0f0f0f;text-align:center;}
+.about h2{ color:#fff; font-size:28px; margin:0 0 16px; }
+.about p{ color:var(--muted); max-width:720px; margin:0 auto; line-height:1.6; }
+.section-list{margin-top:20px;}
+.section-list div{margin-bottom:12px;background:#111;padding:10px;border-radius:6px;}
+
+/* Модальное окно записи */
+#bookingModal {display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);align-items:center;justify-content:center;z-index:100;}
+#bookingModal .modal-content{background:#111;padding:20px;border-radius:10px;max-width:400px;width:90%;}
+#bookingModal input, #bookingModal textarea{width:100%;padding:10px;margin-bottom:10px;border-radius:6px;border:none;background:#222;color:#fff;}
+#bookingModal button{background:var(--accent);border:none;color:#fff;padding:10px 20px;border-radius:8px;cursor:pointer;}
+
+/* Админка */
+#adminPanel{position:fixed;top:60px;right:-320px;width:300px;background:#111;padding:16px;transition:right .3s ease;z-index:90;border-left:3px solid var(--accent);}
+#adminPanel.active{right:0;}
+#adminPanel h3{margin-top:0;color:var(--accent);}
+#adminPanel input, #adminPanel textarea, #adminPanel button{width:100%;margin-bottom:10px;padding:8px;border-radius:6px;border:none;background:#222;color:#fff;}
+#adminToggle{position:fixed;top:70px;right:10px;background:var(--accent);border:none;color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer;z-index:91;}
+</style>
+</head>
+<body>
+
+<header>
+    <div class="logo">LS</div>
+    <nav aria-label="Главное меню">
+        <a href="#">Главная</a>
+        <a href="#reviewsSection">Отзывы</a>
+        <a href="#projectsSection">Проекты</a>
+    </nav>
+</header>
+
+<main>
+<section class="hero" aria-labelledby="hero-title">
+    <div>
+        <h1 id="hero-title">Лука Сулава</h1>
+        <div class="subtitle">Психолог</div>
+        <button id="openBooking" class="btn" type="button">Записаться</button>
+    </div>
+</section>
+
+<section class="about" id="about">
+    <h2>Обо мне</h2>
+    <p id="aboutContent">Я помогаю людям разбираться в себе, своих отношениях, переживаниях и поиске новых опор.</p>
+</section>
+
+<section class="about" id="reviewsSection">
+    <h2>Отзывы</h2>
+    <div class="section-list" id="reviewsList"></div>
+</section>
+
+<section class="about" id="projectsSection">
+    <h2>Проекты</h2>
+    <div class="section-list" id="projectsList"></div>
+</section>
+</main>
+
+<!-- Модальное окно записи -->
+<div id="bookingModal">
+    <div class="modal-content">
+        <h3>Записаться</h3>
+        <input type="text" placeholder="Имя" id="bookName">
+        <input type="email" placeholder="Email" id="bookEmail">
+
+Luka S., [25.10.2025 11:49]
+<textarea placeholder="Комментарий" id="bookComment"></textarea>
+        <button onclick="submitBooking()">Отправить</button>
+        <button onclick="closeBooking()">Закрыть</button>
+    </div>
+</div>
+
+<!-- Админка -->
+<button id="adminToggle">Админка</button>
+<div id="adminPanel">
+    <h3>Админка</h3>
+    <textarea id="adminAbout" placeholder="Обо мне"></textarea>
+    <button onclick="saveAbout()">Сохранить Обо мне</button>
+    
+    <h4>Отзывы</h4>
+    <input id="newReview" placeholder="Добавить отзыв">
+    <button onclick="addReview()">Добавить</button>
+    
+    <h4>Проекты</h4>
+    <input id="projName" placeholder="Название проекта">
+    <input id="projDesc" placeholder="Описание проекта">
+    <button onclick="addProject()">Добавить проект</button>
+</div>
+
+<script>
+// ===== Модалка записи =====
+const modal = document.getElementById('bookingModal');
+document.getElementById('openBooking').addEventListener('click',()=>{modal.style.display='flex';});
+function closeBooking(){modal.style.display='none';}
+function submitBooking(){
+    alert('Спасибо! Ваша запись отправлена.');
+    modal.style.display='none';
+}
+
+// ===== Админка =====
+const adminBtn = document.getElementById('adminToggle');
+const adminPanel = document.getElementById('adminPanel');
+adminBtn.addEventListener('click',()=>{adminPanel.classList.toggle('active');});
+
+// ==== LocalStorage Integration ====
+const aboutContent = document.getElementById('aboutContent');
+const adminAbout = document.getElementById('adminAbout');
+
+function renderAbout(){
+    const txt = localStorage.getItem('aboutText');
+    if(txt){ aboutContent.textContent = txt; adminAbout.value = txt; }
+}
+function saveAbout(){
+    const val = adminAbout.value;
+    localStorage.setItem('aboutText', val);
+    renderAbout();
+}
+
+// ===== Отзывы =====
+let reviews = JSON.parse(localStorage.getItem('reviews')||'[]');
+const reviewsList = document.getElementById('reviewsList');
+function renderReviews(){
+    reviewsList.innerHTML='';
+    reviews.forEach(r=>{
+        const div=document.createElement('div'); div.textContent=r; reviewsList.appendChild(div);
+    });
+}
+function addReview(){
+    const val=document.getElementById('newReview').value;
+    if(val){reviews.push(val); localStorage.setItem('reviews',JSON.stringify(reviews)); document.getElementById('newReview').value=''; renderReviews();}
+}
+
+// ===== Проекты =====
+let projects = JSON.parse(localStorage.getItem('projects')||'[]');
+const projectsList = document.getElementById('projectsList');
+function renderProjects(){
+    projectsList.innerHTML='';
+    projects.forEach(p=>{
+        const div=document.createElement('div'); div.textContent=`${p.name} — ${p.desc}`; projectsList.appendChild(div);
+    });
+}
+function addProject(){
+    const name=document.getElementById('projName').value;
+    const desc=document.getElementById('projDesc').value;
+    if(name && desc){projects.push({name,desc}); localStorage.setItem('projects',JSON.stringify(projects)); document.getElementById('projName').value=''; document.getElementById('projDesc').value=''; renderProjects();}
+}
+
+// ==== Инициализация при загрузке страницы ====
+document.addEventListener('DOMContentLoaded',()=>{
+    renderAbout();
+    renderReviews();
+    renderProjects();
+});
+</script>
+
+</body>
+</html>
