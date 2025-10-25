@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Лука Сулава — Психолог</title>
+    <style>
+        :root{
+            --bg:#000;
+            --panel:#1a1a1a;
+            --accent:#FF6A00;
+            --muted:#CCCCCC;
+        }
+        *{box-sizing:border-box}
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: var(--bg);
+            color: #fff;
+            -webkit-font-smoothing:antialiased;
+            -moz-osx-font-smoothing:grayscale;
+            opacity: 0;
+            animation: fadeInBody 400ms forwards ease-in-out;
+        }
+        @keyframes fadeInBody { to { opacity: 1; } }
+
+        header {
+            width: 100%;
+            padding: 18px 28px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(6px);
+            z-index: 40;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.02) inset;
+        }
+        .logo { font-size:18px; font-weight:700; color:var(--accent); letter-spacing:1px; }
+        nav{display:flex; gap:18px}
+        nav a{ color: #fff; text-decoration:none; font-size:15px; transition: color .18s ease; }
+        nav a:hover{ color: var(--accent); }
+
+        .hero{
+            min-height: 100vh;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:120px 20px 60px; /* leave space for fixed header */
+            text-align:center;
+            background: linear-gradient(180deg,#000 0%,#111 100%);
+        }
+        h1{ margin:0; font-size:56px; letter-spacing:-1px; animation:fadeUp .6s .08s both; }
+        .subtitle{ margin:12px 0 26px; font-size:20px; color:var(--accent); animation:fadeUp .6s .18s both; }
+        @keyframes fadeUp { from{ opacity:0; transform:translateY(18px);} to{opacity:1; transform:none;}}
+
+        .btn {
+            display:inline-block;
+            padding:12px 22px;
+            background:var(--accent);
+            color:#fff;
+            border-radius:10px;
+            border:none;
+            font-size:16px;
+            cursor:pointer;
+            text-decoration:none;
+            transition: transform .18s ease, box-shadow .18s ease;
+            box-shadow: 0 6px 18px rgba(255,106,0,0.08);
+        }
+        .btn:active{ transform: translateY(2px); }
+        .btn:hover{ transform: translateY(-4px); box-shadow:0 12px 28px rgba(255,106,0,0.10); }
+
+        .about{
+            padding:64px 18px;
+            background:#0f0f0f;
+            text-align:center;
+        }
+        .about h2{ color:#fff; font-size:28px; margin:0 0 16px; }
+        .about p{ color:var(--muted); max-width:720px; margin:0 auto; line-height:1.6; }
+
+        /* Modal */
+        .modal {
+            display:none;
+            position:fixed;
+            inset:0;
+            z-index:120;
+            align-items:center;
+            justify-content:center;
+            background: rgba(0,0,0,0.75);
+            padding:20px;
+        }
+        .modal.show { display:flex; animation: modalFade .18s ease both; }
+        @keyframes modalFade { from{ opacity:0; transform:scale(.98);} to{opacity:1; transform:none;} }
+
+        .modal-panel{
+            width:100%;
+            max-width:420px;
+            background:var(--panel);
+            padding:22px;
+            border-radius:12px;
+            border:2px solid rgba(255,106,0,0.15);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+            position:relative;
+        }
+        .modal-panel h3{ margin:0 0 12px; font-size:20px; color:#fff; }
+        .close-btn{
+            position:absolute;
+            right:12px;
+            top:10px;
+            background:transparent;
+            color:var(--accent);
+            border:none;
+            font-size:20px;
+            cursor:pointer;
+        }
+        .form-row{ display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+        .form-row input, .form-row textarea, .form-row select{
+            width:100%; padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.06);
+            background:#0b0b0b; color:#fff; font-size:14px;
+        }
+        .form-row textarea{ min-height:100px; resize:vertical; }
+
+        .hint{ font-size:13px; color:var(--muted); margin-top:8px; }
+
+        /* small screens */
+        @media (max-width:520px){
+            h1{ font-size:36px; }
+            .modal-panel{ padding:18px; border-radius:10px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">LS</div>
+        <nav aria-label="Главное меню">
+            <a href="index.html">Главная</a>
+            <a href="reviews.html">Отзывы</a>
+            <a href="projects.html">Проекты</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero" aria-labelledby="hero-title">
+            <div>
+                <h1 id="hero-title">Лука Сулава</h1>
+                <div class="subtitle">Психолог</div>
+                <button id="openBooking" class="btn" type="button">Записаться</button>
+            </div>
+        </section>
+
+        <section class="about" id="about">
+            <h2>Обо мне</h2>
+            <p>Я помогаю людям разбираться в себе, своих отношениях, переживаниях и поиске новых опор.
+            Психология — это диалог, в котором человек получает возможность услышать самого себя.</p>
+        </section>
+    </main>
+
+    <!-- Modal markup -->
+    <div id="bookingModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modalTitle">
+        <div class="modal-panel" role="document">
+            <button class="close-btn" id="closeModal" aria-label="Закрыть">&times;</button>
+            <h3 id="modalTitle">Запись на консультацию</h3>
+
+            <form id="bookingForm" class="form-row" novalidate>
+                <input id="name" name="name" type="text" placeholder="Ваше имя" required aria-required="true" />
+                <input id="email" name="email" type="email" placeholder="Email" required aria-required="true" />
+                <label style="color:var(--muted); font-size:13px;">Выберите формат</label>
+                <select id="format" name="format">
+                    <option value="online">Онлайн</option>
+                    <option value="offline">Очная</option>
+                </select>
+                <label style="color:var(--muted); font-size:13px;">Удобная дата и время (например: 25.11 18:00)</label>
+                <input id="datetime" name="datetime" type="text" placeholder="Дд.MM  HH:MM" />
+                <textarea id="note" name="note" placeholder="Кратко о запросе (необязательно)"></textarea>
+
+                <div style="display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:6px;">
+                    <div class="hint">Мы ответим в течение 24 часов</div>
+                    <button id="submitBtn" class="btn" type="submit">Отправить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script>
+// Robust modal behavior with event listeners and simple validation
+(function(){
+    const openBtn = document.getElementById('openBooking');
+    const modal = document.getElementById('bookingModal');
+    const closeBtn = document.getElementById('closeModal');
+    const form = document.getElementById('bookingForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function log(msg){ try{ console.log('[Booking] ' + msg); } catch(e){} }
+
+    function openModal(){
+        modal.classList.add('show');
+        modal.setAttribute('aria-hidden', 'false');
+        // focus first input for accessibility
+        const first = modal.querySelector('input, select, textarea, button');
+        if(first) first.focus();
+        // prevent body scroll
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
+        log('modal opened');
+    }
+
+    function closeModal(){
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden', 'true');
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
+        openBtn.focus();
+        log('modal closed');
+    }
+
+    // click handlers
+    openBtn && openBtn.addEventListener('click', openModal);
+    closeBtn && closeBtn.addEventListener('click', closeModal);
+
+    // click outside to close
+    modal.addEventListener('click', function(e){
+        if(e.target === modal){ closeModal(); }
+    });
+
+    // ESC to close
+    document.addEventListener('keydown', function(e){
+        if(e.key === 'Escape' && modal.classList.contains('show')){
+            closeModal();
+        }
+    });
+
+    // form submit handler (demo: prevents real network call and shows data)
+    form.addEventListener('submit', function(e){
+        e.preventDefault();
+        // basic validation
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        if(!name){ alert('Пожалуйста, укажите имя.'); document.getElementById('name').focus(); return; }
+        if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ alert('Пожалуйста, укажите корректный email.'); document.getElementById('email').focus(); return; }
+
+        // Collect data
+        const payload = {
+            name,
+            email,
+            format: document.getElementById('format').value,
+            datetime: document.getElementById('datetime').value.trim(),
+            note: document.getElementById('note').value.trim(),
+            timestamp: new Date().toISOString()
+        };
+
+        // Show user feedback (for now) and log to console
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Отправка...';
+        log('submitting: ' + JSON.stringify(payload));
+
+        // Simulate network delay then show success (replace with real network code as needed)
+        setTimeout(function(){
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Отправить';
+            alert('Заявка принята. Я свяжусь с вами в течение 24 часов.');
+            log('submission simulated success');
+            form.reset();
+            closeModal();
+        }, 900);
+    });
+
+    // Defensive: if JS didn't attach, show error in console
+    if(!openBtn){ console.error('[Booking] Кнопка открытия не найдена (id=openBooking)'); }
+    if(!modal){ console.error('[Booking] Модал не найден (id=bookingModal)'); }
+})();
+</script>
+
+</body>
+</html>
